@@ -1,0 +1,1 @@
+minor type="added" "Add frameMetadataFeatures to VideoPublishOptions, to declare the per-frame metadata (user timestamp, frame id, user data) a published video track carries in its packet trailer, to match the Rust, JS and Python SDKs"

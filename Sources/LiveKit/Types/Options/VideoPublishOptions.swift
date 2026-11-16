@@ -41,6 +41,13 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
 
     public let streamName: String?
 
+    /// The per-frame metadata this track's encoded frames carry, declared to the server on publish.
+    ///
+    /// Empty by default.
+    ///
+    /// - SeeAlso: ``FrameMetadataFeatures``
+    public let frameMetadataFeatures: FrameMetadataFeatures
+
     public init(name: String? = nil,
                 encoding: VideoEncoding? = nil,
                 screenShareEncoding: VideoEncoding? = nil,
@@ -62,6 +69,39 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
         self.preferredBackupCodec = preferredBackupCodec
         self.degradationPreference = degradationPreference
         self.streamName = streamName
+        frameMetadataFeatures = FrameMetadataFeatures()
+    }
+
+    /// Creates options for a track whose encoded frames carry per-frame metadata.
+    ///
+    /// ```swift
+    /// let options = VideoPublishOptions(preferredCodec: .h264,
+    ///                                   frameMetadataFeatures: FrameMetadataFeatures(userTimestamp: true, frameId: true))
+    /// try await room.localParticipant.publish(videoTrack: track, options: options)
+    /// ```
+    public init(name: String? = nil,
+                encoding: VideoEncoding? = nil,
+                screenShareEncoding: VideoEncoding? = nil,
+                simulcast: Bool = true,
+                simulcastLayers: [VideoParameters] = [],
+                screenShareSimulcastLayers: [VideoParameters] = [],
+                preferredCodec: VideoCodec? = nil,
+                preferredBackupCodec: VideoCodec? = nil,
+                degradationPreference: DegradationPreference = .auto,
+                streamName: String? = nil,
+                frameMetadataFeatures: FrameMetadataFeatures)
+    {
+        self.name = name
+        self.encoding = encoding
+        self.screenShareEncoding = screenShareEncoding
+        self.simulcast = simulcast
+        self.simulcastLayers = simulcastLayers
+        self.screenShareSimulcastLayers = screenShareSimulcastLayers
+        self.preferredCodec = preferredCodec
+        self.preferredBackupCodec = preferredBackupCodec
+        self.degradationPreference = degradationPreference
+        self.streamName = streamName
+        self.frameMetadataFeatures = frameMetadataFeatures
     }
 
     // MARK: - Equal
@@ -77,7 +117,8 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
             preferredCodec == other.preferredCodec &&
             preferredBackupCodec == other.preferredBackupCodec &&
             degradationPreference == other.degradationPreference &&
-            streamName == other.streamName
+            streamName == other.streamName &&
+            frameMetadataFeatures == other.frameMetadataFeatures
     }
 
     override public var hash: Int {
@@ -92,6 +133,7 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
         hasher.combine(preferredBackupCodec)
         hasher.combine(degradationPreference)
         hasher.combine(streamName)
+        hasher.combine(frameMetadataFeatures)
         return hasher.finalize()
     }
 }
