@@ -41,6 +41,10 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
 
     public let streamName: String?
 
+    /// Per-frame metadata the publisher appends to each encoded frame as a packet trailer.
+    /// Declaring a feature lets the server forward the trailer to subscribers that understand it.
+    public let packetTrailerFeatures: Set<PacketTrailerFeature>
+
     public init(name: String? = nil,
                 encoding: VideoEncoding? = nil,
                 screenShareEncoding: VideoEncoding? = nil,
@@ -50,7 +54,8 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
                 preferredCodec: VideoCodec? = nil,
                 preferredBackupCodec: VideoCodec? = nil,
                 degradationPreference: DegradationPreference = .auto,
-                streamName: String? = nil)
+                streamName: String? = nil,
+                packetTrailerFeatures: Set<PacketTrailerFeature> = [])
     {
         self.name = name
         self.encoding = encoding
@@ -62,6 +67,7 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
         self.preferredBackupCodec = preferredBackupCodec
         self.degradationPreference = degradationPreference
         self.streamName = streamName
+        self.packetTrailerFeatures = packetTrailerFeatures
     }
 
     // MARK: - Equal
@@ -77,7 +83,8 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
             preferredCodec == other.preferredCodec &&
             preferredBackupCodec == other.preferredBackupCodec &&
             degradationPreference == other.degradationPreference &&
-            streamName == other.streamName
+            streamName == other.streamName &&
+            packetTrailerFeatures == other.packetTrailerFeatures
     }
 
     override public var hash: Int {
@@ -92,6 +99,22 @@ public final class VideoPublishOptions: NSObject, TrackPublishOptions, Sendable 
         hasher.combine(preferredBackupCodec)
         hasher.combine(degradationPreference)
         hasher.combine(streamName)
+        hasher.combine(packetTrailerFeatures)
         return hasher.finalize()
+    }
+}
+
+/// A kind of per-frame metadata carried in a video track's packet trailer.
+public enum PacketTrailerFeature: Int, Sendable, Hashable, CaseIterable {
+    case userTimestamp
+    case frameId
+    case userData
+
+    func toPBType() -> Livekit_PacketTrailerFeature {
+        switch self {
+        case .userTimestamp: .ptfUserTimestamp
+        case .frameId: .ptfFrameID
+        case .userData: .ptfUserData
+        }
     }
 }

@@ -824,6 +824,9 @@ extension LocalParticipant {
                     populator.height = UInt32(dimensions.height)
                     populator.layers = videoLayers
                     populator.simulcastCodecs = simulcastCodecs
+                    populator.packetTrailerFeatures = videoPublishOptions.packetTrailerFeatures
+                        .sorted { $0.rawValue < $1.rawValue }
+                        .map { $0.toPBType() }
 
                     if let streamName = options?.streamName {
                         // Set stream name if specified in options
